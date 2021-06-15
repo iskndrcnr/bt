@@ -35,7 +35,7 @@
 
         var kacdk = Math.ceil(Math.abs(oncekidk - simdi) / (1000 * 60));//ms den sn ye sonrada dk ya çevirildi
         console.log(kacdk);
-if(kacdk > 1){
+if(kacdk > 30){
     //localStorage.setItem("voc_sinav_info_id", myk_id);
 //var sms = GM_openInTab("https://uscom.com.tr/sms.php", true);
 
