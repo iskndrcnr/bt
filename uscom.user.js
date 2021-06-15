@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Voc-Tester Karekod
 // @namespace    iskender
-// @version      3
+// @version      4
 // @description  Heskoduna karekod ekle
 // @author       iskender
 // @match        https://uscom.voc-tester.com/backend.php?r=examPeriod/view&id=*
