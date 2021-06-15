@@ -43,7 +43,7 @@ GM_xmlhttpRequest({
     method: "GET",
     url: "https://uscom.com.tr/sms.php",
     headers: {
-         "Content-Type": "application/javascript"
+         "Content-Type": "application/x-www-form-urlencoded"
     },
     onload: function(response) {
         console.log("sms modulü çalıştı");
