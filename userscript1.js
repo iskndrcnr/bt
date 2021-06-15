@@ -1,12 +1,13 @@
 // ==UserScript==
 // @name         Voc-Tester Karekod
 // @namespace    iskender
-// @version      2
+// @version      3
 // @description  Heskoduna karekod ekle
 // @author       iskender
 // @match        https://uscom.voc-tester.com/backend.php?r=examPeriod/view&id=*
 // @icon         https://www.google.com/s2/favicons?domain=voc-tester.com
-// @grant        none
+// @grant        GM_openInTab
+// @grant        GM_xmlhttpRequest
 // ==/UserScript==
 /* global $ */
 (function() {
@@ -28,6 +29,29 @@
             localStorage.removeItem("voc_sinav_info_tarih");
             localStorage.removeItem("voc_sinav_info_yer");
         }
+
+        var oncekidk = localStorage.getItem("voc_sms_kontol");
+        var simdi = Date.now();
+
+        var kacdk = Math.ceil(Math.abs(oncekidk - simdi) / (1000 * 60));//ms den sn ye sonrada dk ya çevirildi
+if(kacdk > 1){
+    //localStorage.setItem("voc_sinav_info_id", myk_id);
+//var sms = GM_openInTab("https://uscom.com.tr/sms.php", true);
+
+GM_xmlhttpRequest({
+    method: "GET",
+    url: "https://uscom.com.tr/sms.php",
+    headers: {
+         "Content-Type": "application/javascript"
+    },
+    onload: function(response) {
+        console.log("sms modulü çalıştı");
+    }
+});
+localStorage.setItem("voc_sms_kontol",simdi);
+}
+
+
         var myk_id = xpath('//*[@id="examPeriodInfo"]/tbody/tr[2]/td')[0].innerText;
         var yeterlilik = xpath('//*[@id="examPeriodInfo"]/tbody/tr[3]/td')[0].innerText;
         var tarih = xpath('//*[@id="yw1"]/tbody/tr[2]/td')[0].innerText;
