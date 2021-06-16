@@ -75,7 +75,7 @@ localStorage.setItem("voc_sms_kontol",simdi);
         console.log(userIds);
         var addHes = document.evaluate('//*[@id="examDocumentList"]/fieldset/table/tbody', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
         var addeHesInner = document.createElement("tr");
-        addeHesInner.innerHTML = "<td></td><td style='color:red !important;'>HES KODU KARE KOD</td><td><a class='btn btn-warning  btn-mini' onclick='window.open(\"backend.php?r=examPeriod/view&id=heskarekod\");'><i class='fa fa-qrcode fa-3x fa-fw' style='padding: 0;/*0px 4px 0px 4px;*/'></i></a></td>";
+        addeHesInner.innerHTML = "<td></td><td style='color:red !important;'>HES KODU KARE KOD</td><td><a class='btn btn-warning  btn-mini' style='padding:2px 5px 0px 5px;' onclick='window.open(\"backend.php?r=examPeriod/view&id=heskarekod\");'><i class='fa fa-qrcode fa-3x fa-fw'></i></a></td>";
         addHes.appendChild(addeHesInner);
     }
     //karekod tuşuna basıldıysa
