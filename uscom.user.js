@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Voc-Tester Karekod
 // @namespace    iskender
-// @version      4
+// @version      4.0
 // @description  Heskoduna karekod ekle
 // @author       iskender
 // @match        https://uscom.voc-tester.com/backend.php?r=examPeriod/view&id=*
@@ -34,7 +34,6 @@
         var simdi = Date.now();
 
         var kacdk = Math.ceil(Math.abs(oncekidk - simdi) / (1000 * 60));//ms den sn ye sonrada dk ya çevirildi
-        console.log(kacdk);
 if(kacdk > 30){
     //localStorage.setItem("voc_sinav_info_id", myk_id);
 //var sms = GM_openInTab("https://uscom.com.tr/sms.php", true);
@@ -49,7 +48,7 @@ GM_xmlhttpRequest({
         console.log("sms modulü çalıştı");
     }
 });
-localStorage.setItem("voc_sms_kontol",kacdk);
+localStorage.setItem("voc_sms_kontol",simdi);
 }
 
 
@@ -94,30 +93,35 @@ localStorage.setItem("voc_sms_kontol",kacdk);
         link.crossOrigin = 'anonymous';
         link.href = 'https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css';
         document.head.appendChild(link);
-        var jspdf = document.createElement('script');
-        jspdf.async = false;
-        jspdf.type = 'text/javascript';
-        jspdf.src = 'https://unpkg.com/jspdf@latest/dist/jspdf.es.min.js';
-        document.head.appendChild(jspdf);
+        /*
+        var jq = document.createElement('script');
+        jq.async = false;
+        jq.type = 'text/javascript';
+        jq.src = 'https://code.jquery.com/jquery-latest.min.js';
+        document.head.appendChild(jq);
+
         var canvas = document.createElement('script');
         canvas.async = false;
         canvas.type = 'module';
         canvas.src = 'https://html2canvas.hertzen.com/dist/html2canvas.min.js';
         document.head.appendChild(canvas);
+        */
         //document.body.classList.add("container-fluid");
         //document.body.classList.add("row");
         var voc_user_ids = JSON.parse(localStorage.getItem("voc_user_ids")); //get user ids
+        console.log(voc_user_ids);
         var $ = window.jQuery;
         var say = 0;
         voc_user_ids.forEach(function(uid) {
             try{
-            $.ajax({
+            jQuery.ajax({
                 url: "https://uscom.voc-tester.com/backend.php?r=applicant/view&jl=" + uid,
                 async: true, // this will solve the problem
                 contentType: "text/html",
                 data: "",
                 type: "GET",
                 success: function(response) {
+                    console.log(response);
                     if (response) {
 
                         var parser = new DOMParser();
@@ -135,7 +139,10 @@ localStorage.setItem("voc_sms_kontol",kacdk);
                     say++;
                     console.log(say);
                     if (say == voc_user_ids.length) {
-                        console.log("yazdır");
+                        //console.log("yazdır");
+                        setTimeout(function () {
+                        window.print();
+                        }, 5000);
                     }
                 }
             });
