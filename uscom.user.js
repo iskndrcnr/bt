@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Voc-Tester Karekod
 // @namespace    iskender
-// @version      4.1
+// @version      4.2
 // @description  Heskoduna karekod ekle
 // @author       iskender
 // @match        https://uscom.voc-tester.com/backend.php?r=examPeriod/view&id=*
@@ -40,15 +40,21 @@ if(kacdk > 30){
 
 GM_xmlhttpRequest({
     method: "GET",
-    url: "https://uscom.com.tr/sms.php",
+    url: "https://uscom.com.tr/sms_voc.php",
     headers: {
          "Content-Type": "application/x-www-form-urlencoded"
     },
     onload: function(response) {
         console.log("sms modulü çalıştı");
-    }
+    },
+    onerror : function (error) {
+  console.log(error);
+}
 });
 localStorage.setItem("voc_sms_kontol",simdi);
+}
+else{
+ console.log("sms modulü flood koruması");
 }
 
 
