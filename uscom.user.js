@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Voc-Tester Karekod
 // @namespace    iskender
-// @version      4.2
+// @version      4.3
 // @description  Heskoduna karekod ekle
 // @author       iskender
 // @match        https://uscom.voc-tester.com/backend.php?r=examPeriod/view&id=*
@@ -78,7 +78,6 @@ else{
         } catch (err) {
             console.log(err.message);
         }
-        console.log(userIds);
         var addHes = document.evaluate('//*[@id="examDocumentList"]/fieldset/table/tbody', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
         var addeHesInner = document.createElement("tr");
         addeHesInner.innerHTML = "<td></td><td style='color:red !important;'>HES KODU KARE KOD</td><td><a class='btn btn-warning  btn-mini' style='padding:2px 5px 0px 5px;' onclick='window.open(\"backend.php?r=examPeriod/view&id=heskarekod\");'><i class='fa fa-qrcode fa-3x fa-fw'></i></a></td>";
@@ -118,6 +117,7 @@ else{
         console.log(voc_user_ids);
         var $ = window.jQuery;
         var say = 0;
+        var cnt = 0;
         voc_user_ids.forEach(function(uid) {
             try{
             jQuery.ajax({
@@ -127,7 +127,6 @@ else{
                 data: "",
                 type: "GET",
                 success: function(response) {
-                    console.log(response);
                     if (response) {
 
                         var parser = new DOMParser();
@@ -135,16 +134,17 @@ else{
                         //var adsoyad = xmlDoc.evaluate('/html/body/ul/li[4]',xmlDoc,null,XPathResult.FIRST_ORDERED_NODE_TYPE,null).singleNodeValue;
                         var adsoyad = xmlDoc.evaluate('//*[@id="yw0"]/tbody/tr[2]/td', xmlDoc, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
                         var tcno = xmlDoc.evaluate('//*[@id="yw0"]/tbody/tr[3]/td', xmlDoc, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-                        var heskodu = xmlDoc.evaluate('//*[@id="yw7"]/tbody/tr[19]/td', xmlDoc, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+                        var sontr = xmlDoc.evaluate('//*[@id="yw7"]/tbody/tr', xmlDoc, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null).snapshotLength;
+                        var heskodu = xmlDoc.evaluate('//*[@id="yw7"]/tbody/tr['+sontr+']/td', xmlDoc, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
 
-                        if (heskodu.innerText.length == 10) {
+                        if (heskodu && heskodu.innerText.length == 10) {
                             document.getElementById("container").innerHTML += '<div class="col-6"><div class="card mb-4"><div class="row g-0"><div class="col-4"><img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=c64dc337b87b41d08a165ffb020126ac|' + heskodu.innerText + '"></div><div class="col-8"><div class="card-body p-1"><h4 class="card-title">' + adsoyad.innerText + '</h4><h6 class="card-text">' + tcno.innerText + '</h6><h6 class="card-text">' + heskodu.innerText.substring(0, 4) + "-" + heskodu.innerText.substring(4, 8) + "-" + heskodu.innerText.substring(8, 10) + '</h6></div></div></div></div></div>';
+                        cnt++;
                         }
-
                     }
                     say++;
                     console.log(say);
-                    if (say == voc_user_ids.length) {
+                    if (say == voc_user_ids.length && cnt > 0) {
                         //console.log("yazdır");
                         setTimeout(function () {
                         window.print();
