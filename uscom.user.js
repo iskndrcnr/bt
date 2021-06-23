@@ -29,7 +29,7 @@
             localStorage.removeItem("voc_sinav_info_tarih");
             localStorage.removeItem("voc_sinav_info_yer");
         }
-
+/*
         var oncekidk = localStorage.getItem("voc_sms_kontol");
         var simdi = Date.now();
 
@@ -56,7 +56,7 @@ localStorage.setItem("voc_sms_kontol",simdi);
 else{
  console.log("sms modulü flood koruması");
 }
-
+*/
 
         var myk_id = xpath('//*[@id="examPeriodInfo"]/tbody/tr[2]/td')[0].innerText;
         var yeterlilik = xpath('//*[@id="examPeriodInfo"]/tbody/tr[3]/td')[0].innerText;
