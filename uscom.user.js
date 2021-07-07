@@ -20,7 +20,6 @@
         }
         return result;
     }
-    //eğer sınav sayfasıysa
     if (/examPeriod\/view&id\=\d/.test(window.location.href)) {
         if (localStorage.getItem("voc_user_ids") !== null) {
             localStorage.removeItem("voc_user_ids");
@@ -29,35 +28,6 @@
             localStorage.removeItem("voc_sinav_info_tarih");
             localStorage.removeItem("voc_sinav_info_yer");
         }
-/*
-        var oncekidk = localStorage.getItem("voc_sms_kontol");
-        var simdi = Date.now();
-
-        var kacdk = Math.ceil(Math.abs(oncekidk - simdi) / (1000 * 60));//ms den sn ye sonrada dk ya çevirildi
-if(kacdk > 30){
-    //localStorage.setItem("voc_sinav_info_id", myk_id);
-//var sms = GM_openInTab("https://uscom.com.tr/sms.php", true);
-
-GM_xmlhttpRequest({
-    method: "GET",
-    url: "https://uscom.com.tr/sms_voc.php",
-    headers: {
-         "Content-Type": "application/x-www-form-urlencoded"
-    },
-    onload: function(response) {
-        console.log("sms modulü çalıştı");
-    },
-    onerror : function (error) {
-  console.log(error);
-}
-});
-localStorage.setItem("voc_sms_kontol",simdi);
-}
-else{
- console.log("sms modulü flood koruması");
-}
-*/
-
         var myk_id = xpath('//*[@id="examPeriodInfo"]/tbody/tr[2]/td')[0].innerText;
         var yeterlilik = xpath('//*[@id="examPeriodInfo"]/tbody/tr[3]/td')[0].innerText;
         var tarih = xpath('//*[@id="yw1"]/tbody/tr[2]/td')[0].innerText;
@@ -83,14 +53,11 @@ else{
         addeHesInner.innerHTML = "<td></td><td style='color:red !important;'>HES KODU KARE KOD</td><td><a class='btn btn-warning  btn-mini' style='padding:2px 5px 0px 5px;' onclick='window.open(\"backend.php?r=examPeriod/view&id=heskarekod\");'><i class='fa fa-qrcode fa-3x fa-fw'></i></a></td>";
         addHes.appendChild(addeHesInner);
     }
-    //karekod tuşuna basıldıysa
     if (/examPeriod\/view&id\=heskarekod/.test(window.location.href)) {
-        //sayfa hazırlığı
         document.body.innerHTML = '<h4 class="m-0 p-0 text-center">' + localStorage.getItem("voc_sinav_info_id") + ' - ' + localStorage.getItem("voc_sinav_info_tarih") + '</h4><h4 class="m-0 p-0 text-center">' + localStorage.getItem("voc_sinav_info_uy") + '</h4><h5 class="m-0 mb-2 p-0 text-center">' + localStorage.getItem("voc_sinav_info_yer") + '</h5>';
         document.body.style.background = "#ffffff";
         document.body.setAttribute("style", "background-image: none !important;background-color:#ffffff !important;");
         document.body.innerHTML += '<div class="container-fluid row mt-3" id="container"></div>';
-        // Create new link Element
         var link = document.createElement('link');
         link.rel = 'stylesheet';
         link.type = 'text/css';
@@ -98,21 +65,6 @@ else{
         link.crossOrigin = 'anonymous';
         link.href = 'https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css';
         document.head.appendChild(link);
-        /*
-        var jq = document.createElement('script');
-        jq.async = false;
-        jq.type = 'text/javascript';
-        jq.src = 'https://code.jquery.com/jquery-latest.min.js';
-        document.head.appendChild(jq);
-
-        var canvas = document.createElement('script');
-        canvas.async = false;
-        canvas.type = 'module';
-        canvas.src = 'https://html2canvas.hertzen.com/dist/html2canvas.min.js';
-        document.head.appendChild(canvas);
-        */
-        //document.body.classList.add("container-fluid");
-        //document.body.classList.add("row");
         var voc_user_ids = JSON.parse(localStorage.getItem("voc_user_ids")); //get user ids
         console.log(voc_user_ids);
         var $ = window.jQuery;
@@ -131,7 +83,6 @@ else{
 
                         var parser = new DOMParser();
                         var xmlDoc = parser.parseFromString(response, "text/html");
-                        //var adsoyad = xmlDoc.evaluate('/html/body/ul/li[4]',xmlDoc,null,XPathResult.FIRST_ORDERED_NODE_TYPE,null).singleNodeValue;
                         var adsoyad = xmlDoc.evaluate('//*[@id="yw0"]/tbody/tr[2]/td', xmlDoc, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
                         var tcno = xmlDoc.evaluate('//*[@id="yw0"]/tbody/tr[3]/td', xmlDoc, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
                         var sontr = xmlDoc.evaluate('//*[@id="yw7"]/tbody/tr', xmlDoc, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null).snapshotLength;
@@ -145,7 +96,6 @@ else{
                     say++;
                     console.log(say);
                     if (say == voc_user_ids.length && cnt > 0) {
-                        //console.log("yazdır");
                         setTimeout(function () {
                         window.print();
                         }, 5000);
