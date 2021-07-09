@@ -6,6 +6,8 @@
 // @author       iskender
 // @match        https://*.voc-tester.com/backend.php?r=examPeriod/view&id=*
 // @icon         https://www.google.com/s2/favicons?domain=voc-tester.com
+// @require      https://cdn.jsdelivr.net/npm/qrcode@1.4.4/build/qrcode.min.js
+// @resource     REMOTE_CSS https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css
 // @grant        GM_openInTab
 // @grant        GM_xmlhttpRequest
 // ==/UserScript==
@@ -58,13 +60,7 @@
         document.body.style.background = "#ffffff";
         document.body.setAttribute("style", "background-image: none !important;background-color:#ffffff !important;");
         document.body.innerHTML += '<div class="container-fluid row mt-3" id="container"></div>';
-        var link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.type = 'text/css';
-        link.integrity = 'sha384-B0vP5xmATw1+K9KRQjQERJvTumQW0nPEzvF6L/Z6nronJ3oUOFUFpCjEUQouq2+l'
-        link.crossOrigin = 'anonymous';
-        link.href = 'https://cdn.jsdelivr.net/npm/bootstrap@4.6.0/dist/css/bootstrap.min.css';
-        document.head.appendChild(link);
+
         var voc_user_ids = JSON.parse(localStorage.getItem("voc_user_ids")); //get user ids
         console.log(voc_user_ids);
         var $ = window.jQuery;
