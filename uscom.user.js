@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Voc-Tester Karekod
 // @namespace    iskender
-// @version      4.3
+// @version      4.4
 // @description  Heskoduna karekod ekle
 // @author       iskender
 // @match        https://*.voc-tester.com/backend.php?r=examPeriod/view&id=*
@@ -73,7 +73,7 @@
         voc_user_ids.forEach(function(uid) {
             try{
             jQuery.ajax({
-                url: "https://*.voc-tester.com/backend.php?r=applicant/view&jl=" + uid,
+                url: "backend.php?r=applicant/view&jl=" + uid,
                 async: true, // this will solve the problem
                 contentType: "text/html",
                 data: "",
@@ -85,12 +85,12 @@
                         var xmlDoc = parser.parseFromString(response, "text/html");
                         var adsoyad = xmlDoc.evaluate('//*[@id="yw0"]/tbody/tr[2]/td', xmlDoc, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
                         var tcno = xmlDoc.evaluate('//*[@id="yw0"]/tbody/tr[3]/td', xmlDoc, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-                        var sontr = xmlDoc.evaluate('//*[@id="yw7"]/tbody/tr', xmlDoc, null, XPathResult.ORDERED_NODE_SNAPSHOT_TYPE, null).snapshotLength;
-                        var heskodu = xmlDoc.evaluate('//*[@id="yw7"]/tbody/tr['+sontr+']/td', xmlDoc, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
+                        var heskodu = xmlDoc.evaluate('//*[@id="ApplicantInfo_hes_code"]/@value', xmlDoc, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
 
-                        if (heskodu && heskodu.innerText.length == 10) {
+                        if (heskodu && heskodu.value.length == 10) {
                             document.getElementById("container").innerHTML += '<div class="col-6"><div class="card mb-4"><div class="row g-0"><div class="col-4"><img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=c64dc337b87b41d08a165ffb020126ac|' + heskodu.innerText + '"></div><div class="col-8"><div class="card-body p-1"><h4 class="card-title">' + adsoyad.innerText + '</h4><h6 class="card-text">' + tcno.innerText + '</h6><h6 class="card-text">' + heskodu.innerText.substring(0, 4) + "-" + heskodu.innerText.substring(4, 8) + "-" + heskodu.innerText.substring(8, 10) + '</h6></div></div></div></div></div>';
-                        cnt++;
+
+                            cnt++;
                         }
                     }
                     say++;
