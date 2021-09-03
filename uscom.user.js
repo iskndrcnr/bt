@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Voc-Tester Karekod
 // @namespace    iskender
-// @version      4.4
+// @version      5
 // @description  Heskoduna karekod ekle
 // @author       iskender
 // @match        https://*.voc-tester.com/backend.php?r=examPeriod/view&id=*
@@ -20,7 +20,7 @@
         }
         return result;
     }
-    if (/examPeriod\/view&id\=\d/.test(window.location.href)) {
+    if (/examPeriod\/view&id\=\d/.test(window.location.href)) {//programdan aday al
         if (localStorage.getItem("voc_user_ids") !== null) {
             localStorage.removeItem("voc_user_ids");
             localStorage.removeItem("voc_sinav_info_id");
@@ -39,6 +39,7 @@
                 userIds.push(id.innerText);
             });
             if (Object.keys(userIds).length > 0) {
+                //localStorage.setItem("voc_"+myk_id,'{"sinavid":{"voc_user_ids":'+JSON.stringify(userIds)+',"voc_sinav_info_id": "'+myk_id+'","voc_sinav_info_uy": "'+yeterlilik+'","voc_sinav_info_tarih": "'+tarih+'","voc_sinav_info_yer": "'+yer+'"}}');
                 localStorage.setItem("voc_user_ids", JSON.stringify(userIds));
                 localStorage.setItem("voc_sinav_info_id", myk_id);
                 localStorage.setItem("voc_sinav_info_uy", yeterlilik);
@@ -49,11 +50,11 @@
             console.log(err.message);
         }
         var addHes = document.evaluate('//*[@id="examDocumentList"]/fieldset/table/tbody', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-        var addeHesInner = document.createElement("tr");
-        addeHesInner.innerHTML = "<td></td><td style='color:red !important;'>HES KODU KARE KOD</td><td><a class='btn btn-warning  btn-mini' style='padding:2px 5px 0px 5px;' onclick='window.open(\"backend.php?r=examPeriod/view&id=heskarekod\");'><i class='fa fa-qrcode fa-3x fa-fw'></i></a></td>";
-        addHes.appendChild(addeHesInner);
+        var addHesInner = document.createElement("tr");
+        addHesInner.innerHTML = "<td></td><td style='color:red !important;'>HES KODU KARE KOD</td><td><a class='not-progress exam-form-download-usage-document-button btn btn-warning btn-mini' style='padding:2px 5px 0px 5px;' onclick='window.open(\"backend.php?r=examPeriod/view&id=heskarekod\");'><i class='icon icon-barcode icon-white'></i>Oluştur</a></td>";
+        addHes.appendChild(addHesInner);
     }
-    if (/examPeriod\/view&id\=heskarekod/.test(window.location.href)) {
+    if (/examPeriod\/view&id\=heskarekod/.test(window.location.href)) {//QR kod oluştur
         document.body.innerHTML = '<h4 class="m-0 p-0 text-center">' + localStorage.getItem("voc_sinav_info_id") + ' - ' + localStorage.getItem("voc_sinav_info_tarih") + '</h4><h4 class="m-0 p-0 text-center">' + localStorage.getItem("voc_sinav_info_uy") + '</h4><h5 class="m-0 mb-2 p-0 text-center">' + localStorage.getItem("voc_sinav_info_yer") + '</h5>';
         document.body.style.background = "#ffffff";
         document.body.setAttribute("style", "background-image: none !important;background-color:#ffffff !important;");
@@ -114,5 +115,20 @@
             catch(e){
             }
             });
+    }
+    if (/examPeriod\/admin/.test(window.location.href)) {//ID yoksa yanıp sön
+
+        var sinavsatirlari = xpath('//*[@id="exam-period-grid"]/table/tbody/tr');
+        for (var sinavsatir of sinavsatirlari) {
+            var sutunlar = sinavsatir.getElementsByTagName('td');
+            if(sutunlar[2].innerText ==''){
+                sutunlar[2].innerHTML = '<p style="color:red;font-size:18px;font-weight:bold;">UYARI!</p>';
+                var yanson = sutunlar[2].getElementsByTagName('p')[0];
+                setInterval(function() {
+                    yanson.style.display = (yanson.style.display == 'none' ? '' : 'none');
+                }, 800);
+            }
+}
+
     }
 })();
