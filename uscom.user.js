@@ -1,10 +1,12 @@
 // ==UserScript==
 // @name         Voc-Tester Karekod
 // @namespace    iskender
-// @version      5
+// @version      6
 // @description  Heskoduna karekod ekle
 // @author       iskender
 // @match        https://*.voc-tester.com/backend.php?r=examPeriod/view&id=*
+// @match        https://*.voc-tester.com/backend.php?r=examPeriod/admin
+// @match        https://*.voc-tester.com/backend.php?r=examPeriod/admin&ExamPeriod_page=*
 // @icon         https://www.google.com/s2/favicons?domain=voc-tester.com
 // @grant        GM_openInTab
 // @grant        GM_xmlhttpRequest
