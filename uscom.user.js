@@ -8,6 +8,7 @@
 // @match        https://*.voc-tester.com/backend.php?r=examPeriod/admin
 // @match        https://*.voc-tester.com/backend.php?r=examPeriod/admin&ExamPeriod_page=*
 // @match        https://*.voc-tester.com/backend.php?r=examPeriod/update&id=*
+// @match        https://*.voc-tester.com/backend.php?r=examPeriod/create
 // @match        https://*.voc-tester.com/backend.php?r=site/home
 // @icon         https://www.google.com/s2/favicons?domain=voc-tester.com
 // @grant        GM_openInTab
@@ -151,7 +152,7 @@
 }
 
     }
-    if (/examPeriod\/update&id\=\d/.test(window.location.href)) {//ID girişine sadece numara bas
+    if (/examPeriod\/update&id\=\d/.test(window.location.href)||/examPeriod\/create/.test(window.location.href)) {//ID girişine sadece numara bas
     setInputFilter(document.getElementById("ExamPeriod_myk_portal_code"), function(value) {
   return /^\d*$/.test(value) && (value === "" || parseInt(value) <= 1999999); });
 }
