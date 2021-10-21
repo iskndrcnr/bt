@@ -1,12 +1,14 @@
 // ==UserScript==
-// @name         Voc-Tester Karekod
+// @name         Voc-Tester Geliştirici
 // @namespace    iskender
-// @version      6
-// @description  Heskoduna karekod ekle
+// @version      7
+// @description  Voc-Tester'a sonradan özellikler ekler
 // @author       iskender
 // @match        https://*.voc-tester.com/backend.php?r=examPeriod/view&id=*
 // @match        https://*.voc-tester.com/backend.php?r=examPeriod/admin
 // @match        https://*.voc-tester.com/backend.php?r=examPeriod/admin&ExamPeriod_page=*
+// @match        https://*.voc-tester.com/backend.php?r=examPeriod/update&id=*
+// @match        https://*.voc-tester.com/backend.php?r=site/home
 // @icon         https://www.google.com/s2/favicons?domain=voc-tester.com
 // @grant        GM_openInTab
 // @grant        GM_xmlhttpRequest
@@ -22,6 +24,22 @@
         }
         return result;
     }
+    function setInputFilter(textbox, inputFilter) {
+  ["input", "keydown", "keyup", "mousedown", "mouseup", "select", "contextmenu", "drop"].forEach(function(event) {
+    textbox.addEventListener(event, function() {
+      if (inputFilter(this.value)) {
+        this.oldValue = this.value;
+        this.oldSelectionStart = this.selectionStart;
+        this.oldSelectionEnd = this.selectionEnd;
+      } else if (this.hasOwnProperty("oldValue")) {
+        this.value = this.oldValue;
+        this.setSelectionRange(this.oldSelectionStart, this.oldSelectionEnd);
+      } else {
+        this.value = "";
+      }
+    });
+  });
+}
     if (/examPeriod\/view&id\=\d/.test(window.location.href)) {//programdan aday al
         if (localStorage.getItem("voc_user_ids") !== null) {
             localStorage.removeItem("voc_user_ids");
@@ -133,4 +151,49 @@
 }
 
     }
+    if (/examPeriod\/update&id\=\d/.test(window.location.href)) {//ID girişine sadece numara bas
+    setInputFilter(document.getElementById("ExamPeriod_myk_portal_code"), function(value) {
+  return /^\d*$/.test(value) && (value === "" || parseInt(value) <= 1999999); });
+}
+if (/site\/home/.test(window.location.href)) {//Görevleri kabul et
+    try {
+        var gorevler = xpath('//*[@id="tasks-waitingTaskAccept_list"]/table/tbody/tr');
+        gorevler.forEach((gorev) => {
+            if (gorev.querySelectorAll("td")[5].innerText == "Bekliyor") {
+                var link = gorev.querySelectorAll("td")[6].querySelectorAll("a")[0].href;
+                //var params = link.matchAll("(\?|\&)([^=]+)\=([^&]+)");
+                var params = link.split('&');
+                var id = params[1].replace('id=', '');
+                var type = params[2].replace('type=', '');
+                var duty = params[3].replace('duty=', '');
+                if (duty == "Karar+Verici") {
+                    duty = 3;
+                } else if (duty == "Gözetmen") {
+                    duty = 2;
+                } else if (duty == "De%C4%9Ferlendirici") {
+                    duty = 1;
+                } else {
+                    duty = 4;
+                }
+
+                GM_xmlhttpRequest({
+                    method: "POST",
+                    url: "https://uscom.voc-tester.com/backend.php?r=examPeriod/estimatorTaskStatusSave&id=" + id,
+                    headers: {
+                        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+                    },
+                    data: "EstimatorTaskAccept[description]=&action=accept&type=" + type + "&duty=" + duty,
+                    onload: function(response) {
+                        console.log("görevlendirmeler kabul edildi");
+                    }
+                });
+
+            }
+
+        });
+
+    } catch (err) {
+        console.log(err.message);
+    }
+}
 })();
