@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Voc-Tester Geliştirici
 // @namespace    iskender
-// @version      7
+// @version      8
 // @description  Voc-Tester'a sonradan özellikler ekler
 // @author       iskender
 // @match        https://*.voc-tester.com/backend.php?r=examPeriod/view&id=*
@@ -156,45 +156,73 @@
     setInputFilter(document.getElementById("ExamPeriod_myk_portal_code"), function(value) {
   return /^\d*$/.test(value) && (value === "" || parseInt(value) <= 1999999); });
 }
-if (/site\/home/.test(window.location.href)) {//Görevleri kabul et
-    try {
-        var gorevler = xpath('//*[@id="tasks-waitingTaskAccept_list"]/table/tbody/tr');
-        gorevler.forEach((gorev) => {
-            if (gorev.querySelectorAll("td")[5].innerText == "Bekliyor") {
-                var link = gorev.querySelectorAll("td")[6].querySelectorAll("a")[0].href;
-                //var params = link.matchAll("(\?|\&)([^=]+)\=([^&]+)");
-                var params = link.split('&');
-                var id = params[1].replace('id=', '');
-                var type = params[2].replace('type=', '');
-                var duty = params[3].replace('duty=', '');
-                if (duty == "Karar+Verici") {
-                    duty = 3;
-                } else if (duty == "Gözetmen") {
-                    duty = 2;
-                } else if (duty == "De%C4%9Ferlendirici") {
-                    duty = 1;
-                } else {
-                    duty = 4;
+    if (/site\/home/.test(window.location.href)) {//Görevleri kabul et
+        try {
+            var gorevler = xpath('//*[@id="tasks-waitingTaskAccept_list"]/table/tbody/tr');
+            gorevler.forEach((gorev) => {
+                if (gorev.querySelectorAll("td")[5].innerText == "Bekliyor") {
+                    var link = gorev.querySelectorAll("td")[6].querySelectorAll("a")[0].href;
+                    //var params = link.matchAll("(\?|\&)([^=]+)\=([^&]+)");
+                    var params = link.split('&');
+                    var id = params[1].replace('id=', '');
+                    var type = params[2].replace('type=', '');
+                    var duty = params[3].replace('duty=', '');
+                    if (duty == "Karar+Verici") {
+                        duty = 3;
+                    } else if (duty == "Gözetmen") {
+                        duty = 2;
+                    } else if (duty == "De%C4%9Ferlendirici") {
+                        duty = 1;
+                    } else {
+                        duty = 4;
+                    }
+
+                    GM_xmlhttpRequest({
+                        method: "POST",
+                        url: "https://uscom.voc-tester.com/backend.php?r=examPeriod/estimatorTaskStatusSave&id=" + id,
+                        headers: {
+                            "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+                        },
+                        data: "EstimatorTaskAccept[description]=&action=accept&type=" + type + "&duty=" + duty,
+                        onload: function(response) {
+                            console.log("görevlendirmeler kabul edildi");
+                        }
+                    });
+
                 }
 
-                GM_xmlhttpRequest({
-                    method: "POST",
-                    url: "https://uscom.voc-tester.com/backend.php?r=examPeriod/estimatorTaskStatusSave&id=" + id,
-                    headers: {
-                        "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
-                    },
-                    data: "EstimatorTaskAccept[description]=&action=accept&type=" + type + "&duty=" + duty,
-                    onload: function(response) {
-                        console.log("görevlendirmeler kabul edildi");
-                    }
-                });
+            });
 
+        } catch (err) {
+            console.log(err.message);
+        }
+        try {
+        var dokumanlar = xpath('//*[@id="documents_list"]/table/tbody/tr');
+            if (dokumanlar.length > 0) {
+                dokumanlar.forEach((dokuman) => {
+
+                    var doclink = dokuman.querySelectorAll("td")[4].querySelectorAll("a")[0].href;
+                    //var params = doclink.matchAll("(\?|\&)([^=]+)\=([^&]+)");
+                    var docparams = doclink.split('&');
+                    var docid = docparams[1].replace('id=', '');
+
+                    GM_xmlhttpRequest({
+                        method: "GET",
+                        url: "https://uscom.voc-tester.com/backend.php?r=documentDistributionRecord/documentApproved&id=" + docid,
+                        headers: {
+                            "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+                        },
+                        //data: "EstimatorTaskAccept[description]=&action=accept&type=" + type + "&duty=" + duty,
+                        onload: function(response) {
+                            console.log("dokumanlar kabul edildi");
+                        }
+                    });
+
+                });
             }
 
-        });
-
-    } catch (err) {
-        console.log(err.message);
+        } catch (err) {
+            console.log(err.message);
+        }
     }
-}
 })();
