@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Voc-Tester Geliştirici
 // @namespace    iskender
-// @version      9
+// @version      10
 // @description  Voc-Tester'a sonradan özellikler ekler
 // @author       iskender
 // @match        https://*.voc-tester.com/backend.php?r=examPeriod/view&id=*
@@ -14,6 +14,7 @@
 // @grant        GM_openInTab
 // @grant        GM_addStyle
 // @grant        GM_xmlhttpRequest
+// @run-at       document-idle
 // ==/UserScript==
 /* global $ */
 (function() {
@@ -49,17 +50,34 @@
             return aVal - bVal;
         }));
     }
-
-    window.onload = function(){
+window.onload = function() {
+    //window.addEventListener('load', function() {
 
         document.getElementById("btnhes").onclick=function(){
             try {
+
+
+
+                if (localStorage.getItem("voc_user_ids") !== null) {
+                    localStorage.removeItem("voc_user_ids");
+                    localStorage.removeItem("voc_sinav_info_id");
+                    localStorage.removeItem("voc_sinav_info_uy");
+                    localStorage.removeItem("voc_sinav_info_tarih");
+                    localStorage.removeItem("voc_sinav_info_yer");
+                }
+                var myk_id = xpath('//*[@id="examPeriodInfo"]/tbody/tr[2]/td')[0].innerText;
+                var yeterlilik = xpath('//*[@id="examPeriodInfo"]/tbody/tr[3]/td')[0].innerText;
+                var tarih = xpath('//*[@id="yw1"]/tbody/tr[2]/td')[0].innerText;
+                var yer = xpath('//*[@id="yw1"]/tbody/tr[3]/td')[0].innerText;
+
+                //localStorage.clear();
                 var idnolar = xpath('//a[contains(@href,"/backend.php?r=applicant/view&jl=")]');
-                localStorage.clear();
                 var userIds = [];
                 idnolar.forEach(function(id) {
                     userIds.push(id.innerText);
+                    console.log(id.innerText);
                 });
+
                 if (Object.keys(userIds).length > 0) {
                     //localStorage.setItem("voc_"+myk_id,'{"sinavid":{"voc_user_ids":'+JSON.stringify(userIds)+',"voc_sinav_info_id": "'+myk_id+'","voc_sinav_info_uy": "'+yeterlilik+'","voc_sinav_info_tarih": "'+tarih+'","voc_sinav_info_yer": "'+yer+'"}}');
                     localStorage.setItem("voc_user_ids", JSON.stringify(userIds));
@@ -68,26 +86,15 @@
                     localStorage.setItem("voc_sinav_info_tarih", tarih);
                     localStorage.setItem("voc_sinav_info_yer", yer);
                 }
+
                 window.open("backend.php?r=examPeriod/view&id=heskarekod");
             } catch (err) {
                 console.log(err.message);
             }
         }
-    }
+    //}, false);
+    };
     if (/examPeriod\/view&id\=\d/.test(window.location.href)) {//programdan aday al
-        if (localStorage.getItem("voc_user_ids") !== null) {
-            localStorage.removeItem("voc_user_ids");
-            localStorage.removeItem("voc_sinav_info_id");
-            localStorage.removeItem("voc_sinav_info_uy");
-            localStorage.removeItem("voc_sinav_info_tarih");
-            localStorage.removeItem("voc_sinav_info_yer");
-        }
-        var myk_id = xpath('//*[@id="examPeriodInfo"]/tbody/tr[2]/td')[0].innerText;
-        var yeterlilik = xpath('//*[@id="examPeriodInfo"]/tbody/tr[3]/td')[0].innerText;
-        var tarih = xpath('//*[@id="yw1"]/tbody/tr[2]/td')[0].innerText;
-        var yer = xpath('//*[@id="yw1"]/tbody/tr[3]/td')[0].innerText;
-
-
         var addHes = document.evaluate('//*[@id="examDocumentList"]/fieldset/table/tbody', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
         var addHesInner = document.createElement("tr");
         addHesInner.innerHTML = "<td></td><td style='color:red !important;'>HES KODU KARE KOD</td><td><a class='not-progress exam-form-download-usage-document-button btn btn-warning btn-mini' style='padding:2px 5px 0px 5px;' id='btnhes'><i class='icon icon-barcode icon-white'></i>Oluştur</a></td>";
@@ -156,7 +163,6 @@
                                 jQuery('ul li').sort(function(a, b) {
                                     return jQuery(a).data('index') - jQuery(b).data('index');
                                 }).appendTo('ul');
-
 
                                 window.print();
                             }, 5000);
