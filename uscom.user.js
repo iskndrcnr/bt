@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Voc-Tester Geliştirici
 // @namespace    iskender
-// @version      10
+// @version      12
 // @description  Voc-Tester'a sonradan özellikler ekler
 // @author       iskender
 // @match        https://*.voc-tester.com/backend.php?r=examPeriod/view&id=*
@@ -14,7 +14,7 @@
 // @grant        GM_openInTab
 // @grant        GM_addStyle
 // @grant        GM_xmlhttpRequest
-// @run-at       document-idle
+// @run-at       document-end
 // ==/UserScript==
 /* global $ */
 (function() {
@@ -50,6 +50,18 @@
             return aVal - bVal;
         }));
     }
+     function JavaBlink() {
+     var blinks = document.getElementsByTagName('JavaBlink');
+     for (var i = blinks.length - 1; i >= 0; i--) {
+        var s = blinks[i];
+        s.style.visibility = (s.style.visibility === 'visible') ? 'hidden' : 'visible';
+     }
+     window.setTimeout(JavaBlink, 1000);
+  }
+  if (document.addEventListener) document.addEventListener("DOMContentLoaded", JavaBlink, false);
+  else if (window.addEventListener) window.addEventListener("load", JavaBlink, false);
+  else if (window.attachEvent) window.attachEvent("onload", JavaBlink);
+  else window.onload = JavaBlink;
 window.onload = function() {
     //window.addEventListener('load', function() {
 
@@ -183,11 +195,13 @@ window.onload = function() {
         for (var sinavsatir of sinavsatirlari) {
             var sutunlar = sinavsatir.getElementsByTagName('td');
             if(sutunlar[2].innerText ==''){
-                sutunlar[2].innerHTML = '<p style="color:red;font-size:18px;font-weight:bold;">UYARI!</p>';
+                sutunlar[2].innerHTML = '<JavaBlink><p style="color:red;font-size:18px;font-weight:bold;">UYARI!</p></JavaBlink>';
+                /**
                 var yanson = sutunlar[2].getElementsByTagName('p')[0];
                 setInterval(function() {
                     yanson.style.display = (yanson.style.display == 'none' ? '' : 'none');
                 }, 800);
+                **/
             }
         }
 
@@ -209,7 +223,7 @@ window.onload = function() {
                     var duty = params[3].replace('duty=', '');
                     if (duty == "Karar+Verici") {
                         duty = 3;
-                    } else if (duty == "Gözetmen") {
+                    } else if (duty == "G%C3%B6zetmen") {
                         duty = 2;
                     } else if (duty == "De%C4%9Ferlendirici") {
                         duty = 1;
