@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Voc-Tester Geliştirici
 // @namespace    iskender
-// @version      12
+// @version      13
 // @description  Voc-Tester'a sonradan özellikler ekler
 // @author       iskender
 // @match        https://*.voc-tester.com/backend.php?r=examPeriod/view&id=*
@@ -62,7 +62,8 @@
   else if (window.addEventListener) window.addEventListener("load", JavaBlink, false);
   else if (window.attachEvent) window.attachEvent("onload", JavaBlink);
   else window.onload = JavaBlink;
-window.onload = function() {
+/*
+    window.onload = function() {
     //window.addEventListener('load', function() {
 
         document.getElementById("btnhes").onclick=function(){
@@ -125,12 +126,7 @@ window.onload = function() {
         link.crossOrigin = 'anonymous';
         link.href = 'https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css';
         document.head.appendChild(link);
-        /*
-        var jscript = document.createElement('script');
-        jscript.type = 'text/javascript';
-        jscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/tinysort/3.2.5/tinysort.js';
-        document.head.appendChild(jscript);
-        */
+
         GM_addStyle('@media print{li:nth-child(14) {  margin-bottom: 100px;}}');
 
         var voc_user_ids = JSON.parse(localStorage.getItem("voc_user_ids")); //get user ids
@@ -189,6 +185,7 @@ window.onload = function() {
         //each sonu
 
     }
+*/
     if (/examPeriod\/admin/.test(window.location.href)) {//ID yoksa yanıp sön
 
         var sinavsatirlari = xpath('//*[@id="exam-period-grid"]/table/tbody/tr');
