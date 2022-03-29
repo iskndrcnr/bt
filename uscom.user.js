@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Voc-Tester Geliştirici
 // @namespace    iskender
-// @version      14
+// @version      15
 // @description  Voc-Tester'a sonradan özellikler ekler
 // @author       iskender
 // @match        https://*.voc-tester.com/backend.php?r=examPeriod/view&id=*
@@ -224,7 +224,7 @@
                 var adsoyad = smssutunlar[2].innerText.trim();
                 var belgeno = smssutunlar[3].innerText.trim();
                 var telefonno = smssutunlar[6].innerText.trim();
-                var smstext = "Sayın " + adsoyad + ", USCOM Belgelendirmeden almış olduğunuz " + belgeno + " numaralı MYK belgenizin süresi " + kalangun + " gun sonra bitecektir. Süresi bitmeden önce uzatmak veya yenilemek için 0537 526 91 76 numaradan bizimle iletişime geçiniz."
+                var smstext = "Sayın " + adsoyad + ", USCOM Belgelendirmeden almış olduğunuz " + belgeno + " numaralı MYK belgenizin süresi " + kalangun + " gun sonra bitecektir. Süresi bitmeden önce uzatmak veya yenilemek için 0537 526 91 76 veya 0537 526 91 78 numaralardan bizimle iletişime geçiniz."
                 if (kalangun.length<3 & kalangunsayi<15){
 
 
