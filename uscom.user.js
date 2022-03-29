@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Voc-Tester Geliştirici
 // @namespace    iskender
-// @version      15
+// @version      16
 // @description  Voc-Tester'a sonradan özellikler ekler
 // @author       iskender
 // @match        https://*.voc-tester.com/backend.php?r=examPeriod/view&id=*
@@ -204,8 +204,8 @@
         }
 
     }
-    if (/certification\/renew/.test(window.location.href)) {//30 gün altı belge süresine SMS Gönder
-        document.getElementById("applicant-grid_c10").insertAdjacentHTML('beforeend', '<a class="btn btn-warning btn-mini not-progress" style="color:black !important;margin:0 !important; padding:2px !important;" id="btnsms"><i class="icon-bullhorn"></i>30 Günden Az Olanlara SMS Gönder</a>');
+    if (/certification\/renew/.test(window.location.href)) {//15 gün altı belge süresine SMS Gönder
+        document.getElementById("applicant-grid_c10").insertAdjacentHTML('beforeend', '<a class="btn btn-warning btn-mini not-progress" style="color:black !important;margin:0 !important; padding:2px !important;" id="btnsms"><i class="icon-bullhorn"></i>15 Günden Az Olanlara SMS Gönder</a>');
 
         var smssatirlari = xpath('//*[@id="applicant-grid"]/table/tbody/tr');
         //if (localStorage.getItem("30_gunden_az_sms") === null) {
@@ -225,7 +225,7 @@
                 var belgeno = smssutunlar[3].innerText.trim();
                 var telefonno = smssutunlar[6].innerText.trim();
                 var smstext = "Sayın " + adsoyad + ", USCOM Belgelendirmeden almış olduğunuz " + belgeno + " numaralı MYK belgenizin süresi " + kalangun + " gun sonra bitecektir. Süresi bitmeden önce uzatmak veya yenilemek için 0537 526 91 76 veya 0537 526 91 78 numaralardan bizimle iletişime geçiniz."
-                if (kalangun.length<3 & kalangunsayi<15){
+                if (kalangun.length<3 & kalangunsayi<16){
 
 
                     var aday = {"adsoyad": adsoyad, "belgeno": belgeno, "telefonno": telefonno, "kalangunsayi":kalangunsayi,"durum":0, "smstext":smstext}
