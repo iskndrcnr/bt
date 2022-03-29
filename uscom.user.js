@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Voc-Tester Geliştirici
 // @namespace    iskender
-// @version      13
+// @version      14
 // @description  Voc-Tester'a sonradan özellikler ekler
 // @author       iskender
 // @match        https://*.voc-tester.com/backend.php?r=examPeriod/view&id=*
@@ -10,6 +10,7 @@
 // @match        https://*.voc-tester.com/backend.php?r=examPeriod/update&id=*
 // @match        https://*.voc-tester.com/backend.php?r=examPeriod/create
 // @match        https://*.voc-tester.com/backend.php?r=site/home
+// @match        https://*.voc-tester.com/backend.php?r=certification/renew
 // @icon         https://www.google.com/s2/favicons?domain=voc-tester.com
 // @grant        GM_openInTab
 // @grant        GM_addStyle
@@ -203,6 +204,71 @@
         }
 
     }
+    if (/certification\/renew/.test(window.location.href)) {//30 gün altı belge süresine SMS Gönder
+        document.getElementById("applicant-grid_c10").insertAdjacentHTML('beforeend', '<a class="btn btn-warning btn-mini not-progress" style="color:black !important;margin:0 !important; padding:2px !important;" id="btnsms"><i class="icon-bullhorn"></i>30 Günden Az Olanlara SMS Gönder</a>');
+
+        var smssatirlari = xpath('//*[@id="applicant-grid"]/table/tbody/tr');
+        //if (localStorage.getItem("30_gunden_az_sms") === null) {
+            var smsler = {};
+            var adaylar = []
+            smsler.adaylar = adaylar;
+        //}else{
+        //    var smsler = JSON.parse(localStorage.getItem("30_gunden_az_sms"));
+        //}
+
+        for (var smssatir of smssatirlari) {
+            var smssutunlar = smssatir.getElementsByTagName('td');
+            if(smssutunlar[9].innerText !=''){
+                var kalangun = smssutunlar[9].innerText.replace(" gün", "").trim();
+                var kalangunsayi = parseInt(kalangun);
+                var adsoyad = smssutunlar[2].innerText.trim();
+                var belgeno = smssutunlar[3].innerText.trim();
+                var telefonno = smssutunlar[6].innerText.trim();
+                var smstext = "Sayın " + adsoyad + ", USCOM Belgelendirmeden almış olduğunuz " + belgeno + " numaralı MYK belgenizin süresi " + kalangun + " gun sonra bitecektir. Süresi bitmeden önce uzatmak veya yenilemek için 0537 526 91 76 numaradan bizimle iletişime geçiniz."
+                if (kalangun.length<3 & kalangunsayi<15){
+
+
+                    var aday = {"adsoyad": adsoyad, "belgeno": belgeno, "telefonno": telefonno, "kalangunsayi":kalangunsayi,"durum":0, "smstext":smstext}
+                    smsler.adaylar.push(aday);
+
+
+                }else{
+                    break;
+                }
+
+            }else{
+                break;
+            }
+        }
+
+
+    }
+
+            document.getElementById("btnsms").onclick=function(){
+            try {
+                for (var item of smsler.adaylar) {
+                    //console.log(item.smstext);
+
+                      GM_xmlhttpRequest({
+                        method: "POST",
+                        url: "https://uscom.voc-tester.com/backend.php?r=sms/manuel/sendManuel",
+                        headers: {
+                            "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+                        },
+                        data: "message=" + item.smstext + "&phones=" + item.telefonno + "&names=" + item.adsoyad,
+                        onload: function(response) {
+                            if(response.status==200){
+                                alert(item.smstext);
+                            }
+                        }
+                    });
+
+
+                }
+            } catch (err) {
+                console.log(err.message);
+            }
+            }
     if (/examPeriod\/update&id\=\d/.test(window.location.href)||/examPeriod\/create/.test(window.location.href)) {//ID girişine sadece numara bas
         setInputFilter(document.getElementById("ExamPeriod_myk_portal_code"), function(value) {
             return /^\d*$/.test(value) && (value === "" || parseInt(value) <= 1999999); });
