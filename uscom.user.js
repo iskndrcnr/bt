@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Voc-Tester Geliştirici
 // @namespace    iskender
-// @version      16
+// @version      17
 // @description  Voc-Tester'a sonradan özellikler ekler
 // @author       iskender
 // @match        https://*.voc-tester.com/backend.php?r=examPeriod/view&id=*
@@ -269,10 +269,12 @@
                 console.log(err.message);
             }
             }
+    /*
     if (/examPeriod\/update&id\=\d/.test(window.location.href)||/examPeriod\/create/.test(window.location.href)) {//ID girişine sadece numara bas
         setInputFilter(document.getElementById("ExamPeriod_myk_portal_code"), function(value) {
             return /^\d*$/.test(value) && (value === "" || parseInt(value) <= 1999999); });
     }
+    */
     if (/site\/home/.test(window.location.href)) {//Görevleri kabul et
         try {
             var gorevler = xpath('//*[@id="tasks-waitingTaskAccept_list"]/table/tbody/tr');
