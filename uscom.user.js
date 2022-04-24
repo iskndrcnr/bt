@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Voc-Tester Geliştirici
 // @namespace    iskender
-// @version      17
+// @version      18
 // @description  Voc-Tester'a sonradan özellikler ekler
 // @author       iskender
 // @match        https://*.voc-tester.com/backend.php?r=examPeriod/view&id=*
@@ -192,14 +192,11 @@
         var sinavsatirlari = xpath('//*[@id="exam-period-grid"]/table/tbody/tr');
         for (var sinavsatir of sinavsatirlari) {
             var sutunlar = sinavsatir.getElementsByTagName('td');
+            var matches = sutunlar[2].innerText.match(/^([0-9]{7})$/g);
             if(sutunlar[2].innerText ==''){
                 sutunlar[2].innerHTML = '<JavaBlink><p style="color:red;font-size:18px;font-weight:bold;">UYARI!</p></JavaBlink>';
-                /**
-                var yanson = sutunlar[2].getElementsByTagName('p')[0];
-                setInterval(function() {
-                    yanson.style.display = (yanson.style.display == 'none' ? '' : 'none');
-                }, 800);
-                **/
+            }else if(matches == null){
+                sutunlar[2].innerHTML = '<JavaBlink><p style="color:blue;font-size:18px;font-weight:bold;">'+sutunlar[2].innerText+'</p></JavaBlink>';
             }
         }
 
