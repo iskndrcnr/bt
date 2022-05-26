@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Voc-Tester Geliştirici
 // @namespace    iskender
-// @version      18
+// @version      19
 // @description  Voc-Tester'a sonradan özellikler ekler
 // @author       iskender
 // @match        https://*.voc-tester.com/backend.php?r=examPeriod/view&id=*
@@ -11,6 +11,7 @@
 // @match        https://*.voc-tester.com/backend.php?r=examPeriod/create
 // @match        https://*.voc-tester.com/backend.php?r=site/home
 // @match        https://*.voc-tester.com/backend.php?r=certification/renew
+// @match        https://uscom.voc-tester.com/backend.php?r=examPeriod/estimatorTaskAccept&id=*
 // @icon         https://www.google.com/s2/favicons?domain=voc-tester.com
 // @grant        GM_openInTab
 // @grant        GM_addStyle
@@ -63,130 +64,7 @@
   else if (window.addEventListener) window.addEventListener("load", JavaBlink, false);
   else if (window.attachEvent) window.attachEvent("onload", JavaBlink);
   else window.onload = JavaBlink;
-/*
-    window.onload = function() {
-    //window.addEventListener('load', function() {
 
-        document.getElementById("btnhes").onclick=function(){
-            try {
-
-
-
-                if (localStorage.getItem("voc_user_ids") !== null) {
-                    localStorage.removeItem("voc_user_ids");
-                    localStorage.removeItem("voc_sinav_info_id");
-                    localStorage.removeItem("voc_sinav_info_uy");
-                    localStorage.removeItem("voc_sinav_info_tarih");
-                    localStorage.removeItem("voc_sinav_info_yer");
-                }
-                var myk_id = xpath('//*[@id="examPeriodInfo"]/tbody/tr[2]/td')[0].innerText;
-                var yeterlilik = xpath('//*[@id="examPeriodInfo"]/tbody/tr[3]/td')[0].innerText;
-                var tarih = xpath('//*[@id="yw1"]/tbody/tr[2]/td')[0].innerText;
-                var yer = xpath('//*[@id="yw1"]/tbody/tr[3]/td')[0].innerText;
-
-                //localStorage.clear();
-                var idnolar = xpath('//a[contains(@href,"/backend.php?r=applicant/view&jl=")]');
-                var userIds = [];
-                idnolar.forEach(function(id) {
-                    userIds.push(id.innerText);
-                    console.log(id.innerText);
-                });
-
-                if (Object.keys(userIds).length > 0) {
-                    //localStorage.setItem("voc_"+myk_id,'{"sinavid":{"voc_user_ids":'+JSON.stringify(userIds)+',"voc_sinav_info_id": "'+myk_id+'","voc_sinav_info_uy": "'+yeterlilik+'","voc_sinav_info_tarih": "'+tarih+'","voc_sinav_info_yer": "'+yer+'"}}');
-                    localStorage.setItem("voc_user_ids", JSON.stringify(userIds));
-                    localStorage.setItem("voc_sinav_info_id", myk_id);
-                    localStorage.setItem("voc_sinav_info_uy", yeterlilik);
-                    localStorage.setItem("voc_sinav_info_tarih", tarih);
-                    localStorage.setItem("voc_sinav_info_yer", yer);
-                }
-
-                window.open("backend.php?r=examPeriod/view&id=heskarekod");
-            } catch (err) {
-                console.log(err.message);
-            }
-        }
-    //}, false);
-    };
-    if (/examPeriod\/view&id\=\d/.test(window.location.href)) {//programdan aday al
-        var addHes = document.evaluate('//*[@id="examDocumentList"]/fieldset/table/tbody', document, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-        var addHesInner = document.createElement("tr");
-        addHesInner.innerHTML = "<td></td><td style='color:red !important;'>HES KODU KARE KOD</td><td><a class='not-progress exam-form-download-usage-document-button btn btn-warning btn-mini' style='padding:2px 5px 0px 5px;' id='btnhes'><i class='icon icon-barcode icon-white'></i>Oluştur</a></td>";
-        addHes.appendChild(addHesInner);
-    }
-    if (/examPeriod\/view&id\=heskarekod/.test(window.location.href)) {//QR kod oluştur
-        document.body.innerHTML = '<h4 class="m-0 p-0 text-center">' + localStorage.getItem("voc_sinav_info_id") + ' - ' + localStorage.getItem("voc_sinav_info_tarih") + '</h4><h4 class="m-0 p-0 text-center">' + localStorage.getItem("voc_sinav_info_uy") + '</h4><h5 class="m-0 mb-2 p-0 text-center">' + localStorage.getItem("voc_sinav_info_yer") + '</h5>';
-        document.body.style.background = "#ffffff";
-        document.body.setAttribute("style", "background-image: none !important;background-color:#ffffff !important;");
-        document.body.innerHTML += '<ul class="container-fluid row mt-3 list-unstyled" id="container"></ul>';
-
-        var link = document.createElement('link');
-        link.rel = 'stylesheet';
-        link.type = 'text/css';
-        link.integrity = 'sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3'
-        link.crossOrigin = 'anonymous';
-        link.href = 'https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css';
-        document.head.appendChild(link);
-
-        GM_addStyle('@media print{li:nth-child(14) {  margin-bottom: 100px;}}');
-
-        var voc_user_ids = JSON.parse(localStorage.getItem("voc_user_ids")); //get user ids
-        console.log(voc_user_ids);
-        var $ = window.jQuery;
-        var say = 0;
-        var cnt = 0;
-        voc_user_ids.forEach(function callback(uid, index) {
-            try{
-                jQuery.ajax({
-                    url: "backend.php?r=applicant/view&jl=" + uid,
-                    async: true, // this will solve the problem
-                    contentType: "text/html",
-                    data: "",
-                    type: "GET",
-                    success: function(response) {
-                        if (response) {
-
-                            var parser = new DOMParser();
-                            var xmlDoc = parser.parseFromString(response, "text/html");
-                            var adsoyad = xmlDoc.evaluate('//*[@id="yw0"]/tbody/tr[2]/td', xmlDoc, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-                            var tcno = xmlDoc.evaluate('//*[@id="yw0"]/tbody/tr[3]/td', xmlDoc, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-                            var heskodu = xmlDoc.evaluate('//*[@id="ApplicantInfo_hes_code"]/@value', xmlDoc, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null).singleNodeValue;
-                            var cardstyle ="";
-                            if(!/^[A-Z]{1}[0-9]{1}[A-Z]{1}[0-9]{7}$/.test(heskodu.value)){
-                                cardstyle ="bg-danger";
-                            }
-                            if (heskodu && heskodu.value.length == 10) {
-                                document.getElementById("container").innerHTML += '<li class="col-6" data-index="'+index+'"><div class="card mb-4 '+cardstyle+'"><div class="row g-0"><div class="col-4"><img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=c64dc337b87b41d08a165ffb020126ac|' + heskodu.value + '"></div><div class="col-8"><div class="card-body p-1"><h5 class="card-title">' + adsoyad.innerText + '</h5><h6 class="card-text">' + tcno.innerText + '</h6><h6 class="card-text">' + heskodu.value.substring(0, 4) + "-" + heskodu.value.substring(4, 8) + "-" + heskodu.value.substring(8, 10) + '</h6></div></div></div></div></li>';
-
-                                cnt++;
-                            }
-                        }
-
-                        say++;
-                        console.log(say);
-                        if (say == voc_user_ids.length && cnt > 0) {
-                            setTimeout(function () {
-
-                                //sırala
-
-                                jQuery('ul li').sort(function(a, b) {
-                                    return jQuery(a).data('index') - jQuery(b).data('index');
-                                }).appendTo('ul');
-
-                                window.print();
-                            }, 5000);
-                        }
-                    }
-                });
-            }
-            catch(e){
-            }
-        });
-
-        //each sonu
-
-    }
-*/
     if (/examPeriod\/admin/.test(window.location.href)) {//ID yoksa yanıp sön
 
         var sinavsatirlari = xpath('//*[@id="exam-period-grid"]/table/tbody/tr');
@@ -194,9 +72,9 @@
             var sutunlar = sinavsatir.getElementsByTagName('td');
             var matches = sutunlar[2].innerText.match(/^([0-9]{7})$/g);
             if(sutunlar[2].innerText ==''){
-                sutunlar[2].innerHTML = '<JavaBlink><p style="color:red;font-size:18px;font-weight:bold;">UYARI!</p></JavaBlink>';
+                sutunlar[2].innerHTML = '<JavaBlink><p style="color:red;font-size:16px;font-weight:bold;">UYARI!</p></JavaBlink>';
             }else if(matches == null){
-                sutunlar[2].innerHTML = '<JavaBlink><p style="color:blue;font-size:18px;font-weight:bold;">'+sutunlar[2].innerText+'</p></JavaBlink>';
+                sutunlar[2].innerHTML = '<JavaBlink><p style="color:blue;font-size:13px;font-weight:bold;">'+sutunlar[2].innerText+'</p></JavaBlink>';
             }
         }
 
@@ -237,10 +115,6 @@
                 break;
             }
         }
-
-
-    }
-
             document.getElementById("btnsms").onclick=function(){
             try {
                 for (var item of smsler.adaylar) {
@@ -255,7 +129,7 @@
                         data: "message=" + item.smstext + "&phones=" + item.telefonno + "&names=" + item.adsoyad,
                         onload: function(response) {
                             if(response.status==200){
-                                alert(item.smstext);
+                                console.log(item.smstext);
                             }
                         }
                     });
@@ -266,6 +140,10 @@
                 console.log(err.message);
             }
             }
+
+    }
+
+
     /*
     if (/examPeriod\/update&id\=\d/.test(window.location.href)||/examPeriod\/create/.test(window.location.href)) {//ID girişine sadece numara bas
         setInputFilter(document.getElementById("ExamPeriod_myk_portal_code"), function(value) {
@@ -274,10 +152,13 @@
     */
     if (/site\/home/.test(window.location.href)) {//Görevleri kabul et
         try {
+            window.addEventListener('load', (event) => { // its a magic
             var gorevler = xpath('//*[@id="tasks-waitingTaskAccept_list"]/table/tbody/tr');
             gorevler.forEach((gorev) => {
+
                 if (gorev.querySelectorAll("td")[5].innerText == "Bekliyor") {
                     var link = gorev.querySelectorAll("td")[6].querySelectorAll("a")[0].href;
+                    console.log(link);
                     //var params = link.matchAll("(\?|\&)([^=]+)\=([^&]+)");
                     var params = link.split('&');
                     var id = params[1].replace('id=', '');
@@ -308,10 +189,11 @@
                 }
 
             });
-
+});
         } catch (err) {
             console.log(err.message);
         }
+
         try {
             var dokumanlar = xpath('//*[@id="documents_list"]/table/tbody/tr');
             if (dokumanlar.length > 0) {
