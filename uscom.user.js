@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Voc-Tester Geliştirici
 // @namespace    iskender
-// @version      20
+// @version      21
 // @description  Voc-Tester'a sonradan özellikler ekler
 // @author       iskender
 // @match        https://*.voc-tester.com/backend.php?r=examPeriod/view&id=*
@@ -80,6 +80,23 @@
 		}
 		window.setTimeout(JavaBlink, 1000);
 	}
+
+    function Request(url, opt={}) {
+        Object.assign(opt, {
+            url,
+            method: 'GET',
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+            },
+        })
+
+        return new Promise((resolve, reject) => {
+            opt.onerror = opt.ontimeout = reject
+            opt.onload = resolve
+
+            GM_xmlhttpRequest(opt)
+        })
+    }
 	var support = (function() {
 		if (!window.DOMParser) return false;
 		var parser = new DOMParser();
@@ -253,10 +270,6 @@
 		}
 	}
 	if (/certification\/view/.test(window.location.href)) { //Ek belge çıkart
-		//var keys = GM_listValues();
-		//for (var key of keys) {
-		//GM_deleteValue(key);
-		//}
 		var htmlbuton = "";
 		var birimleryeri = xpath('//*[@id="yw0"]/tbody/tr[14]/td');
 		var birimler = [...birimleryeri[0].innerText.matchAll(/\(([0-9]{3})\)/g)];
@@ -265,41 +278,45 @@
 				htmlbuton += '<a class="btn btn-warning btn-mini not-progress ekbelge" style="color:black !important;margin:0 !important; padding:2px !important;" data-id="' + birim[1] + '">Ek Belge Oluştur (' + birim[1] + ')</a>&nbsp;';
 			});
 		}
+        var ekbelgeElements = document.getElementsByClassName("ekbelge");
 		document.getElementById("yw0").getElementsByTagName('tbody')[0].getElementsByTagName('tr')[13].getElementsByTagName('td')[0].insertAdjacentHTML('beforeend', '<br>' + htmlbuton);
-		var elements = document.getElementsByClassName("ekbelge");
-		var ekbelgeBasvuruno = document.getElementById("yw0").getElementsByTagName('tbody')[0].getElementsByTagName('tr')[0].getElementsByTagName('td')[0].innerText;
-		var ekbelgeTc = document.getElementById("yw0").getElementsByTagName('tbody')[0].getElementsByTagName('tr')[1].getElementsByTagName('td')[0].innerText;
-		var ekbelgeAd = document.getElementById("yw0").getElementsByTagName('tbody')[0].getElementsByTagName('tr')[2].getElementsByTagName('td')[0].innerText;
-		var ekbelgeYil = parseInt(document.getElementById("yw0").getElementsByTagName('tbody')[0].getElementsByTagName('tr')[10].getElementsByTagName('td')[0].innerText);
-		var ekbelgeSon = document.getElementById("yw0").getElementsByTagName('tbody')[0].getElementsByTagName('tr')[11].getElementsByTagName('td')[0].getElementsByTagName('a')[0].getAttribute('data-value');
-		var belgeIlkgun = moment(ekbelgeSon, 'YYYY-MM-DD').add(1, 'days').subtract(parseInt(ekbelgeYil), 'years').format("DD.MM.YYYY");
-		var belgeSongun = moment(ekbelgeSon, 'YYYY-MM-DD').format("DD.MM.YYYY");
-		var sertifikatarihi = moment(belgeIlkgun, 'DD.MM.YYYY').add(1, 'days').format("DD.MM.YYYY");
-		var tarih93a = moment(belgeIlkgun, 'DD.MM.YYYY').add(3, 'years').subtract(1, 'days').format("DD.MM.YYYY");
-		var tarih93b = moment(belgeIlkgun, 'DD.MM.YYYY').add(2, 'years').subtract(1, 'days').format("DD.MM.YYYY");
-		var tarih93c = moment(belgeIlkgun, 'DD.MM.YYYY').add(2.5, 'years').subtract(1, 'days').format("DD.MM.YYYY");
-		var gozetim1 = moment(belgeIlkgun, 'DD.MM.YYYY').subtract(1, 'days').add(6, 'months').format("DD.MM.YYYY");
-		var gozetim2 = moment(belgeIlkgun, 'DD.MM.YYYY').subtract(1, 'days').add(12, 'months').format("DD.MM.YYYY");
-		var gozetim3 = moment(belgeIlkgun, 'DD.MM.YYYY').subtract(1, 'days').add(18, 'months').format("DD.MM.YYYY");
-		var gozetim4 = moment(belgeIlkgun, 'DD.MM.YYYY').subtract(1, 'days').add(24, 'months').format("DD.MM.YYYY");
-		var gozetim5 = moment(belgeIlkgun, 'DD.MM.YYYY').subtract(1, 'days').add(30, 'months').format("DD.MM.YYYY");
-		//console.log(moment(belgeSongun).diff(moment().format("DD.MM.YYYY"), 'years',false));
-		GM_setValue("ekbelgeBasvuruno", ekbelgeBasvuruno);
-		GM_setValue("ekbelgeTc", ekbelgeTc);
-		GM_setValue("ekbelgeAd", ekbelgeAd);
-		GM_setValue("ekbelgeYil", ekbelgeYil);
-		GM_setValue("belgeIlkgun", belgeIlkgun);
-		GM_setValue("belgeSongun", belgeSongun);
-		GM_setValue("sertifikatarihi", sertifikatarihi);
-		GM_setValue("tarih93a", tarih93a);
-		GM_setValue("tarih93b", tarih93b);
-		GM_setValue("tarih93c", tarih93c);
-		GM_setValue("gozetim1", gozetim1);
-		GM_setValue("gozetim2", gozetim2);
-		GM_setValue("gozetim3", gozetim3);
-		GM_setValue("gozetim4", gozetim4);
-		GM_setValue("gozetim5", gozetim5);
-		var ekbelgeFonksiyon = function() {
+        var ekbelgeFonksiyon = function() {
+            var keys = GM_listValues();
+            keys.forEach(key => {
+                GM_deleteValue(key);
+            });
+            var ekbelgeBasvuruno = document.getElementById("yw0").getElementsByTagName('tbody')[0].getElementsByTagName('tr')[0].getElementsByTagName('td')[0].innerText;
+            var ekbelgeTc = document.getElementById("yw0").getElementsByTagName('tbody')[0].getElementsByTagName('tr')[1].getElementsByTagName('td')[0].innerText;
+            var ekbelgeAd = document.getElementById("yw0").getElementsByTagName('tbody')[0].getElementsByTagName('tr')[2].getElementsByTagName('td')[0].innerText;
+            var ekbelgeYil = parseInt(document.getElementById("yw0").getElementsByTagName('tbody')[0].getElementsByTagName('tr')[10].getElementsByTagName('td')[0].innerText);
+            var ekbelgeSon = document.getElementById("yw0").getElementsByTagName('tbody')[0].getElementsByTagName('tr')[11].getElementsByTagName('td')[0].getElementsByTagName('a')[0].getAttribute('data-value');
+            var belgeIlkgun = moment(ekbelgeSon, 'YYYY-MM-DD').add(1, 'days').subtract(parseInt(ekbelgeYil), 'years').format("DD.MM.YYYY");
+            var belgeSongun = moment(ekbelgeSon, 'YYYY-MM-DD').format("DD.MM.YYYY");
+            var sertifikatarihi = moment(belgeIlkgun, 'DD.MM.YYYY').add(1, 'days').format("DD.MM.YYYY");
+            var tarih93a = moment(belgeIlkgun, 'DD.MM.YYYY').add(3, 'years').subtract(1, 'days').format("DD.MM.YYYY");
+            var tarih93b = moment(belgeIlkgun, 'DD.MM.YYYY').add(2, 'years').subtract(1, 'days').format("DD.MM.YYYY");
+            var tarih93c = moment(belgeIlkgun, 'DD.MM.YYYY').add(2.5, 'years').subtract(1, 'days').format("DD.MM.YYYY");
+            var gozetim1 = moment(belgeIlkgun, 'DD.MM.YYYY').subtract(1, 'days').add(6, 'months').format("DD.MM.YYYY");
+            var gozetim2 = moment(belgeIlkgun, 'DD.MM.YYYY').subtract(1, 'days').add(12, 'months').format("DD.MM.YYYY");
+            var gozetim3 = moment(belgeIlkgun, 'DD.MM.YYYY').subtract(1, 'days').add(18, 'months').format("DD.MM.YYYY");
+            var gozetim4 = moment(belgeIlkgun, 'DD.MM.YYYY').subtract(1, 'days').add(24, 'months').format("DD.MM.YYYY");
+            var gozetim5 = moment(belgeIlkgun, 'DD.MM.YYYY').subtract(1, 'days').add(30, 'months').format("DD.MM.YYYY");
+            //console.log(moment(belgeSongun).diff(moment().format("DD.MM.YYYY"), 'years',false));
+            GM_setValue("ekbelgeBasvuruno", ekbelgeBasvuruno);
+            GM_setValue("ekbelgeTc", ekbelgeTc);
+            GM_setValue("ekbelgeAd", ekbelgeAd);
+            GM_setValue("ekbelgeYil", ekbelgeYil);
+            GM_setValue("belgeIlkgun", belgeIlkgun);
+            GM_setValue("belgeSongun", belgeSongun);
+            GM_setValue("sertifikatarihi", sertifikatarihi);
+            GM_setValue("tarih93a", tarih93a);
+            GM_setValue("tarih93b", tarih93b);
+            GM_setValue("tarih93c", tarih93c);
+            GM_setValue("gozetim1", gozetim1);
+            GM_setValue("gozetim2", gozetim2);
+            GM_setValue("gozetim3", gozetim3);
+            GM_setValue("gozetim4", gozetim4);
+            GM_setValue("gozetim5", gozetim5);
 			var attribute = this.getAttribute("data-id");
 			var wpsno = "";
 			var tanimlama = "";
@@ -375,6 +392,10 @@
 			GM_setValue("proseskapsam", proseskapsam);
 			GM_setValue("transfer", transfer);
 			GM_setValue("transferkapsam", transferkapsam);
+
+
+            //var dom0 = Request("https://uscom.voc-tester.com/backend.php?r=applicant/view&jl=" + ekbelgeBasvuruno).then(response => {return response.responseText;}).then(data => {return data});
+            //console.log(dom0);
 			GM_xmlhttpRequest({
 				method: "GET",
 				url: "https://uscom.voc-tester.com/backend.php?r=applicant/view&jl=" + ekbelgeBasvuruno,
@@ -396,6 +417,7 @@
 					GM_xmlhttpRequest({
 						method: "GET",
 						url: "https://uscom.voc-tester.com/backend.php?r=location/view&id=" + yerid,
+                        synchronous: true,
 						headers: {
 							"Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
 						},
@@ -419,18 +441,18 @@
 					} catch (e) {
 						if (e !== 'Break') throw e
 					}
-				}
-			});
-			GM_xmlhttpRequest({
+
+                    GM_xmlhttpRequest({
 				method: "GET",
 				url: "https://uscom.voc-tester.com/backend.php?r=examPeriod/decision&id=" + GM_getValue("sinavlink"),
+                synchronous: true,
 				headers: {
 					"Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
 				},
 				onload: function(response3) {
 					var dom3 = stringToHTML(response3.responseText);
 					var sinavkod = xpath('//*[@id="examPeriod_information"]/tbody/tr[1]/td', dom3);
-					console.log(sinavkod);
+					console.log(GM_getValue("sinavlink"));
 					GM_setValue("sinavkod", sinavkod[0].innerText);
 					var tcnumaralar = xpath('//*[@id="exam-period-applicant-decision-grid"]/table/tbody/tr', dom3);
 					try {
@@ -449,11 +471,18 @@
 					}
 				}
 			});
-			window.open("https://www.uscom.com.tr/wp-content/uploads/ekbelge.html");
+				}
+
+            });
+
+            setTimeout(function () {
+                window.open("https://www.uscom.com.tr/wp-content/uploads/ekbelge.html");
+            }, 5000);
+			//window.open("https://www.uscom.com.tr/wp-content/uploads/ekbelge.html");
 			//window.print();
 		};
-		for (var i = 0; i < elements.length; i++) {
-			elements[i].addEventListener('click', ekbelgeFonksiyon, false);
+		for (var i = 0; i < ekbelgeElements.length; i++) {
+			ekbelgeElements[i].addEventListener('click', ekbelgeFonksiyon, false);
 		}
 	}
 	if (/ekbelge/.test(window.location.href)) { //Ekbelge sayfası
@@ -499,10 +528,6 @@
 		document.getElementById("koruyucugaz").innerHTML = GM_getValue("koruyucugaz");
 		document.getElementById("sinavililce").innerHTML = GM_getValue("belgeIlkgun") + " " + GM_getValue("sinavililce");
 		window.jsPDF = window.jspdf.jsPDF;
-		var keys = GM_listValues();
-		keys.forEach(key => {
-			console.log(key, "=>", GM_getValue(key));
-		});
 		$(document).bind("keyup keydown", function(e) {
 			if (e.ctrlKey && e.keyCode == 219) {
 				Print();
