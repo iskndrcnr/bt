@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Voc-Tester Geliştirici
 // @namespace    iskender
-// @version      21
+// @version      22
 // @description  Voc-Tester'a sonradan özellikler ekler
 // @author       iskender
 // @match        https://*.voc-tester.com/backend.php?r=examPeriod/view&id=*
@@ -271,9 +271,10 @@
 	}
 	if (/certification\/view/.test(window.location.href)) { //Ek belge çıkart
 		var htmlbuton = "";
+        var uykodu = xpath('//*[@id="yw0"]/tbody/tr[7]/td/b')[0].innerText;
 		var birimleryeri = xpath('//*[@id="yw0"]/tbody/tr[14]/td');
 		var birimler = [...birimleryeri[0].innerText.matchAll(/\(([0-9]{3})\)/g)];
-		if (birimler.length > 0) {
+		if (birimler.length > 0 && uykodu=="11UY0010-3") {
 			birimler.forEach((birim) => {
 				htmlbuton += '<a class="btn btn-warning btn-mini not-progress ekbelge" style="color:black !important;margin:0 !important; padding:2px !important;" data-id="' + birim[1] + '">Ek Belge Oluştur (' + birim[1] + ')</a>&nbsp;';
 			});
