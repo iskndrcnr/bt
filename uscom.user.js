@@ -11,10 +11,10 @@
 // @match        https://*.voc-tester.com/backend.php?r=examPeriod/create
 // @match        https://*.voc-tester.com/backend.php?r=site/home
 // @match        https://*.voc-tester.com/backend.php?r=certification/renew
-// @match        https://uscom.voc-tester.com/backend.php?r=examPeriod/estimatorTaskAccept&id=*
-// @match        https://uscom.voc-tester.com/backend.php?r=certification/view&id=*
-// @match        https://uscom.voc-tester.com/backend.php?r=examPeriod/decision&id=*
-// @match        https://uscom.voc-tester.com/backend.php?r=estimator/examQuestion&id=*
+// @match        https://*.voc-tester.com/backend.php?r=examPeriod/estimatorTaskAccept&id=*
+// @match        https://*.voc-tester.com/backend.php?r=certification/view&id=*
+// @match        https://*.voc-tester.com/backend.php?r=examPeriod/decision&id=*
+// @match        https://*.voc-tester.com/backend.php?r=estimator/examQuestion&id=*
 // @match        https://www.uscom.com.tr/wp-content/uploads/ekbelge.html
 // @icon         https://www.google.com/s2/favicons?domain=voc-tester.com
 // @grant        GM_openInTab
