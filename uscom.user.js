@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Voc-Tester Geliştirici
 // @namespace    iskender
-// @version      22
+// @version      23
 // @description  Voc-Tester'a sonradan özellikler ekler
 // @author       iskender
 // @match        https://*.voc-tester.com/backend.php?r=examPeriod/view&id=*
@@ -14,6 +14,7 @@
 // @match        https://uscom.voc-tester.com/backend.php?r=examPeriod/estimatorTaskAccept&id=*
 // @match        https://uscom.voc-tester.com/backend.php?r=certification/view&id=*
 // @match        https://uscom.voc-tester.com/backend.php?r=examPeriod/decision&id=*
+// @match        https://uscom.voc-tester.com/backend.php?r=estimator/examQuestion&id=*
 // @match        https://www.uscom.com.tr/wp-content/uploads/ekbelge.html
 // @icon         https://www.google.com/s2/favicons?domain=voc-tester.com
 // @grant        GM_openInTab
@@ -331,7 +332,7 @@
 			var fillergroupkapsam = "FM1, FM2";
 			var transfer = "Spray";
 			var transferkapsam = "Spray";
-			if (attribute == 111) {
+			if (attribute == 111 && uykodu=="11UY0010-3") {
 				proses = "111 (MMA / SMAW)";
 				proseskapsam = "111";
 				wpsno = "pWPS-109";
@@ -342,7 +343,7 @@
 				koruyucugaz = "-";
 				transfer = "Short circuit arc";
 				transferkapsam = "Short circuit arc";
-			} else if (attribute == 131) {
+			} else if (attribute == 131 && uykodu=="11UY0010-3") {
 				proses = "131 (MIG / GMAW)";
 				proseskapsam = "131";
 				wpsno = ""; //wps yazılacak
@@ -353,7 +354,7 @@
 				koruyucugaz = "XX (EN ISO 14175)"; //??
 				fillergroup = "FM5";
 				fillergroupkapsam = "FM5";
-			} else if (attribute == 135) {
+			} else if (attribute == 135 && uykodu=="11UY0010-3") {
 				proses = "135 (MAG / GMAW)";
 				proseskapsam = "135, 138";
 				wpsno = "pWPS-105";
@@ -362,7 +363,7 @@
 				dolgumalzeme = "S";
 				dolgukapsam = "S, M";
 				koruyucugaz = "M24 (EN ISO 14175)";
-			} else if (attribute == 136) {
+			} else if (attribute == 136 && uykodu=="11UY0010-3") {
 				proses = "136 (FCAW)";
 				proseskapsam = "136";
 				wpsno = "pWPS-111";
@@ -371,7 +372,7 @@
 				dolgumalzeme = "S";
 				dolgukapsam = "S, M";
 				koruyucugaz = "M24 (EN ISO 14175)";
-			} else if (attribute == 141) {
+			} else if (attribute == 141 && uykodu=="11UY0010-3") {
 				proses = "141 (TIG / GTAW)";
 				proseskapsam = "141";
 				wpsno = "pWPS-110";
@@ -486,6 +487,41 @@
 			ekbelgeElements[i].addEventListener('click', ekbelgeFonksiyon, false);
 		}
 	}
+    //puanları oto doldur
+    if (/estimator\/examQuestion/.test(window.location.href)) {
+        $(document).ready(function () {
+        var otodoldurbutonlari = xpath('//*[@id="exam-checklist-grid"]/table/thead/tr[2]/td[6]');
+        var otobuttons = '<a class="btn btn-warning btn-mini not-progress hepsisifir" style="color:black !important;margin:0 !important; padding:2px !important;">Hepsi Sıfır</a>&nbsp;<a class="btn btn-success btn-mini not-progress hepsitam" style="color:white !important;margin:0 !important; padding:2px !important;">Hepsi Tam</a>';
+        document.getElementById("exam-checklist-grid").getElementsByTagName('table')[0].getElementsByTagName('thead')[0].getElementsByTagName('tr')[1].getElementsByTagName('td')[5].insertAdjacentHTML('beforeend', otobuttons);
+
+            jQuery('.hepsitam').on('click', function(){
+                jQuery('#exam-checklist-grid table tr td a.maxPoint').each(
+                    function(index){
+                        var input = $(this).parent().next().find('.applicantPoint');
+                        input.val(parseFloat($(this).text()));
+                    })
+            })
+
+            jQuery('.hepsisifir').on('click', function(){
+                jQuery('#exam-checklist-grid table tr td a.maxPoint').each(
+                    function(index){
+                        var input = $(this).parent().next().find('.applicantPoint');
+                        input.val(parseFloat("0"));
+                    })
+            })
+
+            $('input.applicantPoint').change(function() {
+                var tot = 0;
+                $("input.applicantPoint").each(function() {
+                    tot += parseFloat($(this).val());
+                });
+                console.log(tot)
+            });
+
+
+        })
+    }
+
 	if (/ekbelge/.test(window.location.href)) { //Ekbelge sayfası
 		moment.locale('tr');
 		document.querySelector('title').textContent = GM_getValue("ekbelgeAd") + " " + GM_getValue("tanimlama");
