@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Voc-Tester Geliştirici
 // @namespace    iskender
-// @version      24
+// @version      25
 // @description  Voc-Tester'a sonradan özellikler ekler
 // @author       iskender
 // @match        https://*.voc-tester.com/backend.php?r=examPeriod/view&id=*
@@ -270,7 +270,7 @@
             console.log(err.message);
         }
     }
-    if (/certification\/view/.test(window.location.href)) { //Ek belge çıkart
+     if (/certification\/view/.test(window.location.href)) { //Ek belge çıkart
         var htmlbuton = "";
         var uykodu = xpath('//*[@id="yw0"]/tbody/tr[7]/td/b')[0].innerText;
         var birimleryeri = xpath('//*[@id="yw0"]/tbody/tr[14]/td');
@@ -416,6 +416,7 @@
                     var persinavs = xpath('//div[contains(@class, "well")][2]/div/div/table/tbody/tr/td[contains(string(), "' + attribute + '")]/following-sibling::td[2]/span[contains(string(), "Başarılı")]/preceding::table[1]/tbody/tr[3]/td[1]/a[1]/@href[1]', dom);
                     //div[contains(@class, "well")][2]/div/div/table/tbody/tr/td[contains(string(), "141")]/following-sibling::td[2]/span[contains(string(), "Başarılı")]/preceding::table[1]/tbody/tr[3]/td[1]/a[1]/@href[1]
                     var yerid = persinavs[0].value.split("id=")[1];
+                    console.log(persinavs[0]);
                     GM_xmlhttpRequest({
                         method: "GET",
                         url: "https://uscom.voc-tester.com/backend.php?r=location/view&id=" + yerid,
@@ -491,9 +492,10 @@
     if (/estimator\/examQuestion/.test(window.location.href)) {
         $(document).ready(function () {
             //gerekli html eklemeleri
-            var otodoldurbutonlari = xpath('//*[@id="exam-checklist-grid"]/table/thead/tr[2]/td[6]');
+            var otodoldurbutonlari = xpath('//*[@id="exam-checklist-grid"]/table/thead/tr[2]/td[last()]');
             var otobuttons = '<a class="btn btn-success btn-mini not-progress hepsitam" style="color:white !important;margin:0 !important; padding:2px !important;">Hepsi Tam</a>&nbsp;<a class="btn btn-warning btn-mini not-progress hepsisifir" style="color:black !important;margin:0 !important; padding:2px !important;">Hepsi Sıfır</a>';
-            document.getElementById("exam-checklist-grid").getElementsByTagName('table')[0].getElementsByTagName('thead')[0].getElementsByTagName('tr')[1].getElementsByTagName('td')[5].insertAdjacentHTML('beforeend', otobuttons);
+            //document.getElementById("exam-checklist-grid").getElementsByTagName('table')[0].getElementsByTagName('thead')[0].getElementsByTagName('tr')[1].getElementsByTagName('td')[5].insertAdjacentHTML('beforeend', otobuttons);
+            document.getElementById("exam-checklist-grid").getElementsByTagName('table')[0].getElementsByTagName('thead')[0].getElementsByTagName('tr')[1].querySelector("td:last-child").insertAdjacentHTML('beforeend', otobuttons);
             $("body").prepend('<span class="toplampuan scrollup label label-important" style="display: block;margin-bottom:30px;color:white;font-weight:normal;font-size:14px;padding:8px;">Toplam Puan: <strong style="font-weight:bold;font-size:15px;">0</strong></span>');
             //hepsine tam puan ve hepsine sıfır puan ver butonları
             jQuery('input.applicantPoint').each(
