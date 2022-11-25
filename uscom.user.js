@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Voc-Tester Geliştirici
 // @namespace    iskender
-// @version      25
+// @version      26
 // @description  Voc-Tester'a sonradan özellikler ekler
 // @author       iskender
 // @match        https://*.voc-tester.com/backend.php?r=examPeriod/view&id=*
@@ -270,7 +270,7 @@
             console.log(err.message);
         }
     }
-     if (/certification\/view/.test(window.location.href)) { //Ek belge çıkart
+    if (/certification\/view/.test(window.location.href)) { //Ek belge çıkart
         var htmlbuton = "";
         var uykodu = xpath('//*[@id="yw0"]/tbody/tr[7]/td/b')[0].innerText;
         var birimleryeri = xpath('//*[@id="yw0"]/tbody/tr[14]/td');
@@ -412,15 +412,13 @@
                     var dogumtarihi = moment(dogumtarihiyazi, 'DD/MM/YYYY').format("DD.MM.YYYY");
                     GM_setValue("dogumyertarih", dogumtarihi);
                     var dom = stringToHTML(response.responseText);
-                    var sinavsatirlari = xpath('//*[@id="applicant-units-history-table-' + ekbelgeBasvuruno + '"]/table/tbody/tr', dom);
+                    var sinavgecmisleri = xpath('//*[@id="applicant-units-history-table-' + ekbelgeBasvuruno + '"]/table/tbody/tr', dom);
                     var persinavs = xpath('//div[contains(@class, "well")][2]/div/div/table/tbody/tr/td[contains(string(), "' + attribute + '")]/following-sibling::td[2]/span[contains(string(), "Başarılı")]/preceding::table[1]/tbody/tr[3]/td[1]/a[1]/@href[1]', dom);
                     //div[contains(@class, "well")][2]/div/div/table/tbody/tr/td[contains(string(), "141")]/following-sibling::td[2]/span[contains(string(), "Başarılı")]/preceding::table[1]/tbody/tr[3]/td[1]/a[1]/@href[1]
                     var yerid = persinavs[0].value.split("id=")[1];
-                    console.log(persinavs[0]);
                     GM_xmlhttpRequest({
                         method: "GET",
                         url: "https://uscom.voc-tester.com/backend.php?r=location/view&id=" + yerid,
-                        synchronous: true,
                         headers: {
                             "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
                         },
@@ -429,51 +427,51 @@
                             var dom2 = stringToHTML(response2.responseText);
                             var sinavililce = xpath('//*[@id="yw0"]/tbody/tr[2]/td[1]', dom2);
                             GM_setValue("sinavililce", sinavililce[0].innerText);
-                        }
-                    });
-                    var myReg = new RegExp('(' + attribute + ')');
-                    try {
-                        sinavsatirlari.forEach((sinavsatir) => {
-                            var durumlar = xpath('/td', sinavsatir);
-                            if (durumlar[0].innerText.match(myReg) && durumlar[3].innerText == "Başarılı") {
-                                var sinavlink = durumlar[6].getElementsByTagName('a')[0].getAttribute('href');
-                                GM_setValue("sinavlink", sinavlink.split("id=")[1]);
-                                throw 'Break';
-                            }
-                        });
-                    } catch (e) {
-                        if (e !== 'Break') throw e
-                    }
-
-                    GM_xmlhttpRequest({
-                        method: "GET",
-                        url: "https://uscom.voc-tester.com/backend.php?r=examPeriod/decision&id=" + GM_getValue("sinavlink"),
-                        synchronous: true,
-                        headers: {
-                            "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
-                        },
-                        onload: function(response3) {
-                            var dom3 = stringToHTML(response3.responseText);
-                            var sinavkod = xpath('//*[@id="examPeriod_information"]/tbody/tr[1]/td', dom3);
-                            console.log(GM_getValue("sinavlink"));
-                            GM_setValue("sinavkod", sinavkod[0].innerText);
-                            var tcnumaralar = xpath('//*[@id="exam-period-applicant-decision-grid"]/table/tbody/tr', dom3);
+                            var myReg = new RegExp('(' + attribute + ')');
                             try {
-                                tcnumaralar.forEach((tcnumara, index) => {
-                                    var belgeler = xpath('/td', tcnumara);
-                                    if (tcnumara.getElementsByTagName("td")[3].innerText == GM_getValue("ekbelgeTc")) {
-                                        GM_setValue("sirano", (index + 1).toLocaleString('tr-TR', {
-                                            minimumIntegerDigits: 2,
-                                            useGrouping: false
-                                        }));
+                                sinavgecmisleri.forEach((sinavsatir) => {
+                                    var durumlar = xpath('/td', sinavsatir);
+                                    if (sinavsatir.getElementsByTagName("td")[0].innerText.match(myReg) && sinavsatir.getElementsByTagName("td")[3].innerText == "Başarılı") {
+                                        var sinavlink = sinavsatir.getElementsByTagName("td")[6].getElementsByTagName('a')[0].getAttribute('href');
+                                        GM_setValue("sinavlink", sinavlink.split("id=")[1]);
                                         throw 'Break';
                                     }
                                 });
                             } catch (e) {
                                 if (e !== 'Break') throw e
                             }
+
+                            GM_xmlhttpRequest({
+                                method: "GET",
+                                url: "https://uscom.voc-tester.com/backend.php?r=examPeriod/decision&id=" + GM_getValue("sinavlink"),
+                                headers: {
+                                    "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+                                },
+                                onload: function(response3) {
+                                    var dom3 = stringToHTML(response3.responseText);
+                                    var sinavkod = xpath('//*[@id="examPeriod_information"]/tbody/tr[1]/td', dom3);
+                                    GM_setValue("sinavkod", sinavkod[0].innerText);
+                                    var tcnumaralar = xpath('//*[@id="exam-period-applicant-decision-grid"]/table/tbody/tr', dom3);
+                                    try {
+                                        tcnumaralar.forEach((tcnumara, index) => {
+                                            //var belgeler = xpath('/td', tcnumara);
+                                            //console.log(tcnumara.getElementsByTagName("td")[3]);
+                                            if (tcnumara.getElementsByTagName("td")[3].innerText == GM_getValue("ekbelgeTc")) {
+                                                GM_setValue("sirano", (index + 1).toLocaleString('tr-TR', {
+                                                    minimumIntegerDigits: 2,
+                                                    useGrouping: false
+                                                }));
+                                                throw 'Break';
+                                            }
+                                        });
+                                    } catch (e) {
+                                        if (e !== 'Break') throw e
+                                    }
+                                }
+                            });
                         }
                     });
+
                 }
 
             });
@@ -549,7 +547,7 @@
 */
 
         })
-//puan toplama ve yazdırma fonksiyonu
+        //puan toplama ve yazdırma fonksiyonu
         function puantopla() {
             var tot = 0;
             $("input.applicantPoint").each(function() {
