@@ -42,36 +42,34 @@
     //askıdaki belgeleri myk dan da askıya al
     function mykAski(){
 
-
         var butonAskiYer = xpath('//*[@id="applicant-grid"]/table/thead/tr[2]/td[last()]');
         var butonAski = '<a class="btn btn-warning btn-mini not-progress toplumykaski" style="color:black !important;margin:0 !important; padding:2px !important;">MYK\'da Askıya Al</a>';
         document.getElementById("applicant-grid").getElementsByTagName('table')[0].getElementsByTagName('thead')[0].getElementsByTagName('tr')[1].querySelector("td:last-child").insertAdjacentHTML('beforeend', butonAski);
         document.getElementsByClassName("toplumykaski")[0].addEventListener('click', (event) => {
             event.preventDefault();
-            var belgeNos = xpath('//*[@id="applicant-grid"]/table/tbody/tr/td[12]/text()');
+            var belgeNos = xpath('//*[@id="applicant-grid"]/table/tbody/tr/td[12]');
             request("GET","https://portal.myk.gov.tr","").then(function(event){
                 var parser = new DOMParser();
                 var domDoc = parser.parseFromString(event.responseText, "text/html").getElementsByTagName("html")[0];
                 var nekot_frsc = xpath('//meta[@name="nekot_frsc"]/@content',domDoc)[0].value;
-                console.log(nekot_frsc);
-                console.log(xpath('//*[@id="isimGosterDiv"]',domDoc)[0]);
-                request("POST","https://portal.myk.gov.tr/index.php?option=com_user","username=icinar&passwd=icinar12345.&Submit=Giri%C5%9F+Yap&option=com_user&task=login&return=Lw%3D%3D&"+nekot_frsc+"=1").then(function(event2){
-                    var parser2 = new DOMParser();
-                    var domDoc2 = parser2.parseFromString(event2.responseText, "text/html").getElementsByTagName("html")[0];
-                    var nekot_frsc2 = xpath('//meta[@name="nekot_frsc"]/@content',domDoc2)[0].value;
-                    console.log(nekot_frsc2);
-                    console.log(xpath('//*[@id="isimGosterDiv"]',domDoc2)[0]);
-                    belgeNos.forEach(function(belgeNo) {
-                        console.log(belgeNo);
-                        console.log(encodeURIComponent(belgeNo));
-                        request("GET","https://portal.myk.gov.tr/index.php?option=com_belgelendirme&view=tekrar_basim&layout=belge_duzenleme&belgeNo="+encodeURIComponent(belgeNo),"").then(function(event3){
-                            var parser3 = new DOMParser();
-                    var domDoc3 = parser3.parseFromString(event3.responseText, "text/html").getElementsByTagName("html")[0];
-                            console.log(domDoc3);
-                        });
-
+                var loginDurum = xpath('//*[@id="s5_login"]/ul/li/span/span',domDoc)[0].innerText.trim()
+                if(loginDurum != "Çıkış"){
+                    request("POST","https://portal.myk.gov.tr/index.php?option=com_user","username=icinar&passwd=icinar12345.&Submit=Giri%C5%9F+Yap&option=com_user&task=login&return=Lw%3D%3D&"+nekot_frsc+"=1").then(function(event2){
+                        var parser2 = new DOMParser();
+                        var domDoc2 = parser2.parseFromString(event2.responseText, "text/html").getElementsByTagName("html")[0];
+                        var nekot_frsc2 = xpath('//meta[@name="nekot_frsc"]/@content',domDoc2)[0].value;
                     });
+                }
+
+                belgeNos.forEach(function(belgeNo,index) {
+
+                    request("POST","https://portal.myk.gov.tr/index.php?option=com_belgelendirme&view=belgelendirme_islemleri&task=KurulusSinavlarBelgeNo&format=raw","belgeNo=" + encodeURIComponent(belgeNo.innerText) +"&kurulusId=21003221","json").then(function(event3){
+                        var dat = JSON.parse(event3.responseText);
+                        console.log(dat);
+                    });
+
                 });
+
             });
 
 
@@ -137,14 +135,14 @@
                 $(this).before('&nbsp;<button class="btn btn-mini tamla">Tam Puan</button>&nbsp;<button class="btn btn-mini sifirla">0 Puan</button>');
             })
         //inputa sıfır puan verir
-        jQuery('.sifirla').on('click', function(){
+        jQuery('.tamla').on('click', function(){
             var input = $(this).parent().find('.applicantPoint');
             input.val(parseFloat("0"));
             puantopla();
         });
         //imputa tam puan verir
-        jQuery('.tamla').on('click', function(){
-            var tampuan = $(this).parent().prev().find('.maxPoint').text().replace(",", ".");
+        jQuery('.sifirla').on('click', function(){
+            var tampuan = $(this).parent().find('.maxPoint').text().replace(",", ".");
             var input = $(this).parent().find('.applicantPoint');
             input.val(parseFloat(tampuan));
             puantopla();
@@ -446,7 +444,7 @@
             });
         });
     }
-        function request2 (method, url, data, token="", datatype=""){
+    function request2 (method, url, data, token="", datatype=""){
         return new Promise((resolve, reject) => {
             GM_xmlhttpRequest({
                 method: method,
@@ -517,7 +515,7 @@
     //======================================================
 
     //======================================================
-
+    const timer = ms => new Promise(res => setTimeout(res, ms))
     function sleep( seconds ){
         return new Promise(function(resolve){
             setTimeout( resolve, seconds * 1000 );
