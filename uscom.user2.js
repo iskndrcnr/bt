@@ -4,7 +4,7 @@
 // @version      1
 // @description  Voc testera yeni özellikler ekler
 // @author       You
-// @match        https://uscom.voc-tester.com/backend.php?r=certification/view
+// @match        https://uscom.voc-tester.com/backend.php?r=certification/view&id=*
 // @match        https://uscom.voc-tester.com/backend.php?r=examPeriod/admin
 // @match        https://uscom.voc-tester.com/backend.php?r=applicant/create
 // @match        https://uscom.voc-tester.com/backend.php?r=estimator/examQuestion&id=*
